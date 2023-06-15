@@ -18,24 +18,22 @@ interface WCProps {
   providerMetadata: IProviderMetadata;
   relayUrl?: string;
   sessionParams?: ISessionParams;
-  themeMode?: 'light' | 'dark';
 }
 
 export const useWalletConnect = ({
   projectId,
   relayUrl,
   providerMetadata,
-  themeMode,
   sessionParams = defaultSessionParams,
 }: WCProps) => {
-  useConfigure({ projectId, relayUrl, providerMetadata, themeMode });
+  useConfigure({ projectId, relayUrl, providerMetadata });
 
   const { pairingUri } = useSnapshot(WcConnectionCtrl.state);
   const wallets = useSnapshot(ExplorerCtrl.state.wallets);
   const accountState = useSnapshot(AccountCtrl.state);
   const clientState = useSnapshot(ClientCtrl.state);
 
-  const connectToWallet = useCallback(
+  const connectToWalletService = useCallback(
     (walletInfo: Listing) => {
       if (pairingUri) {
         ConfigCtrl.setRecentWalletDeepLink(
@@ -84,7 +82,7 @@ export const useWalletConnect = ({
   };
 
   return {
-    connectToWallet,
+    connectToWalletService,
     isConnected: accountState.isConnected,
     address: accountState.address,
     provider: clientState.initialized ? ClientCtrl.provider() : undefined,

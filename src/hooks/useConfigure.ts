@@ -13,7 +13,7 @@ import { removeDeepLinkWallet } from '../utils/StorageUtil';
 import { ThemeCtrl } from '../controllers/ThemeCtrl';
 import { ToastCtrl } from '../controllers/ToastCtrl';
 
-export interface ConfigureProps {
+interface ConfigureProps {
   projectId: string;
   providerMetadata: IProviderMetadata;
   relayUrl?: string;
