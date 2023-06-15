@@ -4,17 +4,30 @@ import { ClientCtrl } from '../controllers/ClientCtrl';
 import { ConfigCtrl } from '../controllers/ConfigCtrl';
 import { ExplorerCtrl } from '../controllers/ExplorerCtrl';
 import { WcConnectionCtrl } from '../controllers/WcConnectionCtrl';
-import { useConfigure, type ConfigureProps } from '../hooks/useConfigure';
+import { useConfigure } from '../hooks/useConfigure';
 import type { Listing } from '../types/controllerTypes';
 import { ExplorerUtil } from '../utils/ExplorerUtil';
 import { useSnapshot } from 'valtio';
+import type { SessionTypes } from '@walletconnect/types';
+import { setDeepLinkWallet } from '../utils/StorageUtil';
+import { defaultSessionParams } from '../constants/Config';
+import type { IProviderMetadata, ISessionParams } from '../types/coreTypes';
+
+interface WCProps {
+  projectId: string;
+  providerMetadata: IProviderMetadata;
+  relayUrl?: string;
+  sessionParams?: ISessionParams;
+  themeMode?: 'light' | 'dark';
+}
 
 export const useWalletConnect = ({
   projectId,
   relayUrl,
   providerMetadata,
   themeMode,
-}: ConfigureProps) => {
+  sessionParams = defaultSessionParams,
+}: WCProps) => {
   useConfigure({ projectId, relayUrl, providerMetadata, themeMode });
 
   const { pairingUri } = useSnapshot(WcConnectionCtrl.state);
@@ -38,6 +51,38 @@ export const useWalletConnect = ({
     [pairingUri]
   );
 
+  const onSessionCreated = async (session: SessionTypes.Struct) => {
+    ClientCtrl.setSessionTopic(session.topic);
+    const deepLink = ConfigCtrl.getRecentWalletDeepLink();
+    try {
+      if (deepLink) {
+        await setDeepLinkWallet(deepLink);
+        ConfigCtrl.setRecentWalletDeepLink(undefined);
+      }
+      AccountCtrl.getAccount();
+    } catch (error) {}
+  };
+
+  const onSessionError = async () => {
+    ConfigCtrl.setRecentWalletDeepLink(undefined);
+  };
+
+  const onConnect = async () => {
+    const provider = ClientCtrl.provider();
+    try {
+      if (!provider) throw new Error('Provider not initialized');
+
+      if (!accountState.isConnected) {
+        const session = await provider.connect(sessionParams);
+        if (session) {
+          onSessionCreated(session);
+        }
+      }
+    } catch (error) {
+      onSessionError();
+    }
+  };
+
   return {
     connectToWallet,
     isConnected: accountState.isConnected,
@@ -45,5 +90,6 @@ export const useWalletConnect = ({
     provider: clientState.initialized ? ClientCtrl.provider() : undefined,
     uri: pairingUri,
     wallets,
+    connect: onConnect,
   };
 };
