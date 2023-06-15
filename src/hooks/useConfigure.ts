@@ -13,7 +13,7 @@ import { removeDeepLinkWallet } from '../utils/StorageUtil';
 import { ThemeCtrl } from '../controllers/ThemeCtrl';
 import { ToastCtrl } from '../controllers/ToastCtrl';
 
-interface Props {
+export interface ConfigureProps {
   projectId: string;
   providerMetadata: IProviderMetadata;
   relayUrl?: string;
@@ -25,7 +25,7 @@ export function useConfigure({
   relayUrl,
   providerMetadata,
   themeMode,
-}: Props) {
+}: ConfigureProps) {
   const colorScheme = useColorScheme();
   const resetApp = useCallback(() => {
     ClientCtrl.resetSession();
