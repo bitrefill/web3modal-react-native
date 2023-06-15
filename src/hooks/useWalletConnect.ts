@@ -74,11 +74,13 @@ export const useWalletConnect = ({
         const session = await provider.connect(sessionParams);
         if (session) {
           onSessionCreated(session);
+          return session;
         }
       }
     } catch (error) {
       onSessionError();
     }
+    return undefined;
   };
 
   return {
