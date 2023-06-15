@@ -1,12 +1,12 @@
-import { useCallback } from "react";
-import { AccountCtrl } from "src/controllers/AccountCtrl";
-import { ClientCtrl } from "src/controllers/ClientCtrl";
-import { ConfigCtrl } from "src/controllers/ConfigCtrl";
-import { ExplorerCtrl } from "src/controllers/ExplorerCtrl";
-import { WcConnectionCtrl } from "src/controllers/WcConnectionCtrl";
-import { useConfigure, type ConfigureProps } from "src/hooks/useConfigure";
-import type { Listing } from "src/types/controllerTypes";
-import { ExplorerUtil } from "src/utils/ExplorerUtil";
+import { useCallback } from 'react';
+import { AccountCtrl } from '../controllers/AccountCtrl';
+import { ClientCtrl } from '../controllers/ClientCtrl';
+import { ConfigCtrl } from '../controllers/ConfigCtrl';
+import { ExplorerCtrl } from '../controllers/ExplorerCtrl';
+import { WcConnectionCtrl } from '../controllers/WcConnectionCtrl';
+import { useConfigure, type ConfigureProps } from '../hooks/useConfigure';
+import type { Listing } from '../types/controllerTypes';
+import { ExplorerUtil } from '../utils/ExplorerUtil';
 import { useSnapshot } from 'valtio';
 
 export const useWalletConnect = ({
@@ -22,18 +22,21 @@ export const useWalletConnect = ({
   const accountState = useSnapshot(AccountCtrl.state);
   const clientState = useSnapshot(ClientCtrl.state);
 
-  const connectToWallet = useCallback((walletInfo: Listing) => {
-    if (pairingUri) {
-      ConfigCtrl.setRecentWalletDeepLink(
-        walletInfo.mobile?.native || walletInfo.mobile?.universal
-      );
-      ExplorerUtil.navigateDeepLink(
-        walletInfo.mobile.universal,
-        walletInfo.mobile.native,
-        pairingUri
-      );
-    }
-  }, [pairingUri, wallets]);
+  const connectToWallet = useCallback(
+    (walletInfo: Listing) => {
+      if (pairingUri) {
+        ConfigCtrl.setRecentWalletDeepLink(
+          walletInfo.mobile?.native || walletInfo.mobile?.universal
+        );
+        ExplorerUtil.navigateDeepLink(
+          walletInfo.mobile.universal,
+          walletInfo.mobile.native,
+          pairingUri
+        );
+      }
+    },
+    [pairingUri]
+  );
 
   return {
     connectToWallet,
