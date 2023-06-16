@@ -91,5 +91,6 @@ export const useWalletConnect = ({
     uri: pairingUri,
     wallets,
     connect: onConnect,
+    resetSession: ClientCtrl.resetSession,
   };
 };
